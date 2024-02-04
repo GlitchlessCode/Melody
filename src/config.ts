@@ -2,6 +2,9 @@ import yaml from "js-yaml";
 import fs from "fs";
 import path from "path";
 import logger from "./utils/logger";
+import { config as dotenv_config } from "dotenv";
+
+dotenv_config();
 
 interface IConfig {
     botToken: string;
@@ -36,25 +39,25 @@ interface IConfig {
 }
 
 let config: IConfig = {
-    botToken: "",
-    clientId: "",
-    geniusApiKey: "",
-    embedColour: "#2B2D31",
-    enableAnalytics: true,
-    enableAutocomplete: true,
+    botToken: process.env.BOT_TOKEN,
+    clientId: process.env.CLIENT_ID,
+    geniusApiKey: process.env.GENIUS_API_KEY,
+    embedColour: process.env.EMBED_COLOUR,
+    enableAnalytics: process.env.ENABLE_ANALYTICS == "true",
+    enableAutocomplete: process.env.ENABLE_AUTOCOMPLETE == "true",
     player: {
-        leaveOnEndDelay: "5m",
-        leaveOnStopDelay: "5m",
-        leaveOnEmptyDelay: "5m",
-        deafenBot: true,
+        leaveOnEndDelay: process.env.LEAVE_ON_END_DELAY,
+        leaveOnStopDelay: process.env.LEAVE_ON_STOP_DELAY,
+        leaveOnEmptyDelay: process.env.LEAVE_ON_EMPTY_DELAY,
+        deafenBot: process.env.DEAFEN_BOT == "true",
     },
     emojis: {
-        stop: "⏹",
-        skip: "⏭",
-        queue: "📜",
-        pause: "⏯",
-        lyrics: "📜",
-        back: "⏮",
+        stop: process.env.STOP,
+        skip: process.env.SKIP,
+        queue: process.env.QUEUE,
+        pause: process.env.PAUSE,
+        lyrics: process.env.LYRICS,
+        back: process.env.BACK,
     },
     proxy: {
         enable: false,
@@ -64,60 +67,16 @@ let config: IConfig = {
         useCustomCookie: false,
         youtubeCookie: "",
     },
-    debug: false,
+    debug: process.env.DEBUG == "true",
 };
 
-try {
-    if (!fs.existsSync(path.join(__dirname, "..", "config.yml"))) {
-        logger.error("Unable to find config.yml file. Please copy the default configuration into a file named config.yml in the root directory. (The same directory as package.json)");
-        process.exit(1);
-    }
-
-    const configFile: any = yaml.load(fs.readFileSync(path.join(__dirname, "..", "config.yml"), "utf8"));
-
-    config = {
-        botToken: configFile.botToken ?? "",
-        clientId: configFile.clientId ?? "",
-        geniusApiKey: configFile.geniusApiKey ?? "",
-        embedColour: configFile.embedColour ?? "#2B2D31",
-        enableAnalytics: configFile.enableAnalytics ?? true,
-        enableAutocomplete: configFile.enableAutocomplete ?? true,
-        player: {
-            leaveOnEndDelay: configFile.player.leaveOnEndDelay ?? "5m",
-            leaveOnStopDelay: configFile.player.leaveOnStopDelay ?? "5m",
-            leaveOnEmptyDelay: configFile.player.leaveOnEmptyDelay ?? "5m",
-            deafenBot: configFile.player.deafenBot ?? true,
-        },
-        emojis: {
-            stop: configFile.emojis.stop ?? "⏹",
-            skip: configFile.emojis.skip ?? "⏭",
-            queue: configFile.emojis.queue ?? "📜",
-            pause: configFile.emojis.pause ?? "⏯",
-            lyrics: configFile.emojis.lyrics ?? "📜",
-            back: configFile.emojis.back ?? "⏮",
-        },
-        proxy: {
-            enable: configFile.proxy.enable ?? false,
-            connectionUrl: configFile.proxy.connectionUrl ?? "",
-        },
-        cookies: {
-            useCustomCookie: configFile.cookies.useCustomCookie ?? false,
-            youtubeCookie: configFile.cookies.youtubeCookie ?? "",
-        },
-        debug: configFile.debug ?? false,
-    };
-} catch (err) {
-    logger.error("Unable to parse config.yml. Please make sure it is valid YAML.");
-    process.exit(1);
-}
-
 if (!config.botToken || config.botToken === "") {
-    logger.error("Please supply a bot token in your configuration file.");
+    logger.error("Please supply a bot token in your environment variables");
     process.exit(1);
 }
 
 if (!config.clientId || config.clientId === "") {
-    logger.error("Please supply a client ID in your configuration file.");
+    logger.error("Please supply a client ID in your environment variables");
     process.exit(1);
 }
 
