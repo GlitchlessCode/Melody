@@ -13,15 +13,6 @@ import handleButtons from "./functions/handleButtons";
 import handleCommands from "./functions/handleCommands";
 import handleEvents from "./functions/handleEvents";
 import handleMenus from "./functions/handleMenus";
-const express = require("express");
-
-const express_app = express();
-
-express_app.get("/", function (req, res) {
-    res.status(200).send();
-});
-
-express_app.listen(3000);
 
 registerProcessEvents();
 
